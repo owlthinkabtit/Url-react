@@ -1,10 +1,12 @@
+import Logo from '../assets/logo.svg'
+
 function NavBar() {
   return (
     <header className="container">
       <nav className="nav_wrapper">
         <div className="nav_left">
           <a href="/">
-            <img className="logo" src="./assets/" alt="Shortly Logo" />
+            <img className="logo" src={Logo} alt="Shortly Logo" />
           </a>
           <ul className="nav_links">
             <li>
