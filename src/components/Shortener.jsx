@@ -37,3 +37,5 @@ function Shortener() {
     </section>
   );
 }
+
+export default Shortener;
