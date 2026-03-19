@@ -1,12 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import LinkCard from "./LinkCard";
 
 function Shortener() {
   const [input, setInput] = useState("");
-  const [links, setLinks] = useState([]);
+  const [links, setLinks] = useState(() => {
+    const saved = localStorage.getItem("shortenedLinks");
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [copyIndex, setCopyIndex] = useState(null);
+  const [error, setError] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem("shortenedLinks", JSON.stringify(links));
+  }, [links]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!input) return;
+    if (!input) {
+      setError(true);
+      return;
+    }
+    setError(false);
 
     const dataToSend = new URLSearchParams();
     dataToSend.append("url", input);
@@ -36,17 +50,26 @@ function Shortener() {
     }
   };
 
+  const handleCopy = (url, index) => {
+    navigator.clipboard.writeText(url);
+    setCopyIndex(index);
+    setTimeout(() => setCopyIndex(null), 2000);
+  };
+
   return (
     <section id="shorten-area">
       <div className="container">
         <div className="shorten_container">
           <form className="shorten-form" onSubmit={handleSubmit}>
-            <div className="input-control">
+            <div className={`input-control ${error ? "error" : ""}`}>
               <input
                 type="text"
                 placeholder="Shorten a link here..."
                 value={input}
-                onChange={(event) => setInput(event.target.value)}
+                onChange={(event) => {
+                  setInput(event.target.value);
+                  if (event.target.value) setError(false);
+                }}
               />
               <span className="error-msg">Please add a link</span>
             </div>
@@ -56,10 +79,13 @@ function Shortener() {
           </form>
         </div>
         {links.map((link, index) => (
-          <div key={index} className="link-card">
-            <span className="long-url">{link.long}</span>
-            <span className="short-url">{link.short}</span>
-          </div>
+          <LinkCard
+            key={index}
+            link={link}
+            index={index}
+            copyIndex={copyIndex}
+            onCopy={handleCopy}
+          />
         ))}
       </div>
     </section>
