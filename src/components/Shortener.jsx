@@ -9,6 +9,7 @@ function Shortener() {
   });
   const [copyIndex, setCopyIndex] = useState(null);
   const [error, setError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     localStorage.setItem("shortenedLinks", JSON.stringify(links));
@@ -21,6 +22,7 @@ function Shortener() {
       return;
     }
     setError(false);
+    setIsLoading(true);
 
     const dataToSend = new URLSearchParams();
     dataToSend.append("url", input);
@@ -47,6 +49,8 @@ function Shortener() {
       setInput("");
     } catch (error) {
       console.error("There was an error shortening your link:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -73,8 +77,8 @@ function Shortener() {
               />
               <span className="error-msg">Please add a link</span>
             </div>
-            <button type="submit" className="btn-cyan">
-              Shorten It!
+            <button type="submit" className="btn-cyan" disabled={isLoading}>
+              {isLoading ? "Shortening..." : "Shorten It!"}
             </button>
           </form>
         </div>
